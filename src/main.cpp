@@ -51,6 +51,7 @@ int main() {
       handle_exit(tokens);
     } else if (tokens[0] == "echo") {
       handle_echo(tokens);
+      continue;
     } else if (tokens[0] == "type") {
       builtins["type"](tokens);
       continue;
