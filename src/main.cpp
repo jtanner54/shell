@@ -1,11 +1,14 @@
 #include <iostream>
 #include <string>
 
-int main() {
-  // Flush after every std::cout / std:cerr
-  std::cout << std::unitbuf;
-  std::cerr << std::unitbuf;
+using namespace std;
 
-  // TODO: Uncomment the code below to pass the first stage
-  // std::cout << "$ ";
+int main() {
+  // Flush after every cout / cerr
+  cout << unitbuf;
+  cerr << unitbuf;
+
+  cout << "$ ";
+
+  return 0;
 }
