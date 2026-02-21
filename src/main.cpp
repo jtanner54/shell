@@ -10,5 +10,10 @@ int main() {
 
   cout << "$ ";
 
+  string input = "";
+  cin >> input;
+
+  cout << input << ": command not found" << "\n";
+
   return 0;
 }
