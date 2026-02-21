@@ -8,12 +8,15 @@ int main() {
   cout << unitbuf;
   cerr << unitbuf;
 
-  cout << "$ ";
+  while(true) {
+    cout << "$ ";
 
-  string input = "";
-  cin >> input;
+    string input;
+    getline(cin, input);
 
-  cout << input << ": command not found" << "\n";
+    cout << input << ": command not found" << endl;
+  }
+  
 
   return 0;
 }
