@@ -1,16 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-void handle_exit(const vector<string>& tokens) { exit(0); }
-
-// want &args and not *args b/c far simpler
-void handle_echo(const vector<string>& tokens) {
-  for (int i = 1; i < tokens.size(); i++) {
-    cout << tokens[i] << " ";
-  }
-  cout << endl;
-}
-
 int main() {
   // Flush after every cout / cerr
   cout << unitbuf;
@@ -19,21 +9,30 @@ int main() {
   // function type that returns nothing and takes in paramteer of
   // vector<string>& directly w/o copy
   unordered_map<string, function<void(const vector<string>&)>> builtins = {
-      {"exit", handle_exit},
-      {"echo", handle_echo},
+      {"exit", [](auto tokens) { exit(0); }},
+      {"echo",
+       [](auto tokens) {
+         for (int i = 1; i < tokens.size(); i++) {
+           cout << tokens[i] << " ";
+         }
+         cout << endl;
+       }},
+      {"type",
+       [&builtins](auto tokens) {
+         if (tokens.size() > 1) {
+           for (int i = 1; i < tokens.size(); i++) {
+             if (builtins.count(tokens[i])) {
+               cout << tokens[i] << " is a shell builtin" << endl;
+             } else {
+               cout << tokens[i] << ": not found" << endl;
+             }
+           }
+         } else {
+           cout << "type: no arguments" << endl;
+         }
+       }},
   };
 
-  builtins["type"] = [&builtins](const vector<string>& tokens) {
-    if (tokens.size() > 1) {
-      for (int i = 1; i < tokens.size(); i++) {
-        if (builtins.count(tokens[i])) {
-          cout << tokens[i] << " is a shell builtin" << endl;
-        } else {
-          cout << tokens[i] << ": not found" << endl;
-        }
-      }
-    }
-  };
   while (true) {
     cout << "$ ";
 
@@ -47,17 +46,11 @@ int main() {
       tokens.push_back(token);  // get list of arguments
     }
 
-    if (tokens[0] == "exit") {
-      handle_exit(tokens);
-    } else if (tokens[0] == "echo") {
-      handle_echo(tokens);
-      continue;
-    } else if (tokens[0] == "type") {
-      builtins["type"](tokens);
-      continue;
+    if (builtins.count(tokens[0])) {
+      builtins[tokens[0]](tokens);
+    } else {
+      cout << tokens[0] << ": command not found" << endl;
     }
-
-    cout << input << ": command not found" << endl;
   }
 
   return 0;
