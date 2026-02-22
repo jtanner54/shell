@@ -1,6 +1,39 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+vector<string> split(const string& str, char delimiter) {
+  vector<string> internal;
+  stringstream ss(str);  // Turn the string into a stream.
+  string tok;
+
+  while (getline(ss, tok, delimiter)) {
+    internal.push_back(tok);
+  }
+
+  return internal;
+}
+
+bool searchExecutable(string name) {
+  const char* path = getenv("PATH");
+
+  if (path != nullptr) {
+    vector<string> paths = split(path, ':');
+
+    for (string path : paths) {
+      string executable = path + "/" + name;
+
+      if (filesystem::exists(executable)) {
+        if (filesystem::perms::owner_exec == filesystem::perms::group_all) {
+          cout << name << " is " << path << endl;
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+}
+
 int main() {
   // Flush after every cout / cerr
   cout << unitbuf;
@@ -19,6 +52,9 @@ int main() {
        }},
       {"type",
        [&builtins](auto tokens) {
+         if (searchExecutable(tokens[0])) {
+           return;
+         }
          if (tokens.size() > 1) {
            for (int i = 1; i < tokens.size(); i++) {
              if (builtins.count(tokens[i])) {
@@ -38,13 +74,7 @@ int main() {
 
     string input;
     getline(cin, input);
-    stringstream ss(input);
-    vector<string> tokens;
-    string token;
-
-    while (getline(ss, token, ' ')) {
-      tokens.push_back(token);  // get list of arguments
-    }
+    vector<string> tokens = split(input, ' ');
 
     if (builtins.count(tokens[0])) {
       builtins[tokens[0]](tokens);
