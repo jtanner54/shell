@@ -51,13 +51,12 @@ int main() {
        }},
       {"type",
        [&builtins](auto tokens) {
-         if (searchExecutable(tokens[0])) {
-           return;
-         }
          if (tokens.size() > 1) {
            for (int i = 1; i < tokens.size(); i++) {
              if (builtins.count(tokens[i])) {
                cout << tokens[i] << " is a shell builtin" << endl;
+             } else if (searchExecutable(tokens[i])) {
+               return;
              } else {
                cout << tokens[i] << ": not found" << endl;
              }
