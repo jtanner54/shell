@@ -24,7 +24,7 @@ bool searchExecutable(string name) {
 
       if (filesystem::exists(executable)) {
         if (access(executable.c_str(), X_OK) == 0) {
-          cout << name << " is " << path << endl;
+          cout << name << " is " << executable << endl;
           return true;
         }
       }
