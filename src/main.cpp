@@ -23,15 +23,14 @@ bool searchExecutable(string name) {
       string executable = path + "/" + name;
 
       if (filesystem::exists(executable)) {
-        if (filesystem::perms::owner_exec == filesystem::perms::group_all) {
+        if (access(executable.c_str(), X_OK) == 0) {
           cout << name << " is " << path << endl;
           return true;
         }
       }
     }
-
-    return false;
   }
+  return false;
 }
 
 int main() {
