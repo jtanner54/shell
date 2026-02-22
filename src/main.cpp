@@ -23,47 +23,46 @@ string searchExecutable(string name) {
     for (string path : paths) {
       string executable = path + "/" + name;
 
-      if (filesystem::exists(executable)) {
+      if (filesystem::exists(executable) &&
+          access(executable.c_str(), X_OK) == 0) {
         return executable;
       }
     }
+    return "";
   }
-  return "";
 }
 
 void execFile(string name, vector<string> args) {
   string executable = searchExecutable(name);
 
   if (executable != "") {
-    if (access(executable.c_str(), X_OK) == 0) {
-      // need char** for execv
-      vector<char*> c_args;
-      // & cause just reference; no need for copying each string
-      for (auto& arg : args) {
-        // c_str returns const char*
-        c_args.push_back(const_cast<char*>(arg.c_str()));
-      }
-      c_args.push_back(nullptr);  // execv expects a null-terminated array
+    // need char** for execv
+    vector<char*> c_args;
+    // & cause just reference; no need for copying each string
+    for (auto& arg : args) {
+      // c_str returns const char*
+      c_args.push_back(const_cast<char*>(arg.c_str()));
+    }
+    c_args.push_back(nullptr);  // execv expects a null-terminated array
 
-      pid_t pid = fork();  // makes carbon copy
-      // child gets 0
-      // parents gets id of child
+    pid_t pid = fork();  // makes carbon copy
+    // child gets 0
+    // parents gets id of child
 
-      if (pid == -1) {
-        // parent error
-        perror("parent failed to fork");
-      } else if (pid == 0) {
-        // child process: only runs in the new process
-        execv(executable.c_str(), c_args.data());
-        perror("execv");
-        // use _exit for system call
-        _exit(1);
-      } else {
-        // parent process: only runs in the original process
-        int status;
-        // give specific pid (parent has this from fork() call)
-        waitpid(pid, &status, 0);
-      }
+    if (pid == -1) {
+      // parent error
+      perror("parent failed to fork");
+    } else if (pid == 0) {
+      // child process: only runs in the new process
+      execv(executable.c_str(), c_args.data());
+      perror("execv");
+      // use _exit for system call
+      _exit(1);
+    } else {
+      // parent process: only runs in the original process
+      int status;
+      // give specific pid (parent has this from fork() call)
+      waitpid(pid, &status, 0);
     }
   } else {
     cout << name << ": command not found" << endl;
