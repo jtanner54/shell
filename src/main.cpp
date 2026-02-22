@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+#include <sys/wait.h>
 using namespace std;
 
 vector<string> split(const string& str, char delimiter) {
@@ -44,15 +45,24 @@ void execFile(string name, vector<string> args) {
       }
       c_args.push_back(nullptr);  // execv expects a null-terminated array
 
-      pid_t pid = fork();
+      pid_t pid = fork();  // makes carbon copy
+      // child gets 0
+      // parents gets id of child
 
       if (pid == -1) {
         // parent error
         perror("parent failed to fork");
       } else if (pid == 0) {
-        // child
+        // child process: only runs in the new process
         execv(executable.c_str(), c_args.data());
         perror("execv");
+        // use _exit for system call
+        _exit(1);
+      } else {
+        // parent process: only runs in the original process
+        int status;
+        // give specific pid (parent has this from fork() call)
+        waitpid(pid, &status, 0);
       }
     }
   } else {
