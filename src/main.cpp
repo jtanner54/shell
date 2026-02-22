@@ -13,7 +13,7 @@ vector<string> split(const string& str, char delimiter) {
   return internal;
 }
 
-bool searchExecutable(string name) {
+string searchExecutable(string name) {
   const char* path = getenv("PATH");
 
   if (path != nullptr) {
@@ -23,14 +23,41 @@ bool searchExecutable(string name) {
       string executable = path + "/" + name;
 
       if (filesystem::exists(executable)) {
-        if (access(executable.c_str(), X_OK) == 0) {
-          cout << name << " is " << executable << endl;
-          return true;
-        }
+        return executable;
       }
     }
   }
-  return false;
+  return "";
+}
+
+void execFile(string name, vector<string> args) {
+  string executable = searchExecutable(name);
+
+  if (executable != "") {
+    if (access(executable.c_str(), X_OK) == 0) {
+      // need char** for execv
+      vector<char*> c_args;
+      // & cause just reference; no need for copying each string
+      for (auto& arg : args) {
+        // c_str returns const char*
+        c_args.push_back(const_cast<char*>(arg.c_str()));
+      }
+      c_args.push_back(nullptr);  // execv expects a null-terminated array
+
+      pid_t pid = fork();
+
+      if (pid == -1) {
+        // parent error
+        perror("parent failed to fork");
+      } else if (pid == 0) {
+        // child
+        execv(executable.c_str(), c_args.data());
+        perror("execv");
+      }
+    }
+  } else {
+    cout << name << ": command not found" << endl;
+  }
 }
 
 int main() {
@@ -53,10 +80,12 @@ int main() {
        [&builtins](auto tokens) {
          if (tokens.size() > 1) {
            for (int i = 1; i < tokens.size(); i++) {
+             string path = searchExecutable(tokens[i]);
+
              if (builtins.count(tokens[i])) {
                cout << tokens[i] << " is a shell builtin" << endl;
-             } else if (searchExecutable(tokens[i])) {
-               return;
+             } else if (path != "") {
+               cout << tokens[i] << " is " << path << endl;
              } else {
                cout << tokens[i] << ": not found" << endl;
              }
@@ -77,7 +106,8 @@ int main() {
     if (builtins.count(tokens[0])) {
       builtins[tokens[0]](tokens);
     } else {
-      cout << tokens[0] << ": command not found" << endl;
+      execFile(tokens[0], tokens);
+      // cout << tokens[0] << ": command not found" << endl;
     }
   }
 
