@@ -125,6 +125,14 @@ int main() {
              }
 
              return;
+           } else if (tokens[1] == "~") {
+             try {
+               fs::current_path(fs::path(getenv("HOME")));
+             } catch (const fs::filesystem_error& e) {
+               cerr << "cd: " << e.what() << endl;
+             }
+
+             return;
            } else {
              cerr << "cd: " << path.string() << ": No such file or directory"
                   << endl;
@@ -147,7 +155,6 @@ int main() {
       builtins[tokens[0]](tokens);
     } else {
       execFile(tokens[0], tokens);
-      // cout << tokens[0] << ": command not found" << endl;
     }
   }
 
