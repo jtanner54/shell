@@ -15,7 +15,7 @@ vector<string> split(const string& str, char delimiter) {
   }
 
   return internal;
-}  // namespace fs=filesystemvector<string> split(conststring&str,chardelimiter)
+}
 
 string searchExecutable(string name) {
   const char* path = getenv("PATH");
@@ -26,8 +26,7 @@ string searchExecutable(string name) {
     for (string path : paths) {
       string executable = path + "/" + name;
 
-      if (filesystem::exists(executable) &&
-          access(executable.c_str(), X_OK) == 0) {
+      if (fs::exists(executable) && access(executable.c_str(), X_OK) == 0) {
         return executable;
       }
     }
@@ -111,6 +110,25 @@ int main() {
        [](auto tokens) {
          // .string() returns type path as a native string
          cout << fs::current_path().string() << endl;
+       }},
+      {"cd",
+       [](auto tokens) {
+         // only two args
+         if (tokens.size() == 2) {
+           fs::path path = tokens[1];
+
+           if (fs::is_directory(path)) {
+             try {
+               fs::current_path(path);
+             } catch (const fs::filesystem_error& e) {
+               cerr << "cd: " << e.what() << endl;
+             }
+
+             return;
+           }
+         }
+
+         cout << "cd: too many arguments" << endl;
        }},
   };
 
