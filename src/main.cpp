@@ -1,6 +1,9 @@
 #include <bits/stdc++.h>
 #include <sys/wait.h>
+
+#include <filesystem>
 using namespace std;
+namespace fs = filesystem;
 
 vector<string> split(const string& str, char delimiter) {
   vector<string> internal;
@@ -12,7 +15,7 @@ vector<string> split(const string& str, char delimiter) {
   }
 
   return internal;
-}
+}  // namespace fs=filesystemvector<string> split(conststring&str,chardelimiter)
 
 string searchExecutable(string name) {
   const char* path = getenv("PATH");
@@ -28,8 +31,9 @@ string searchExecutable(string name) {
         return executable;
       }
     }
-    return "";
   }
+
+  return "";
 }
 
 void execFile(string name, vector<string> args) {
@@ -102,6 +106,11 @@ int main() {
          } else {
            cout << "type: no arguments" << endl;
          }
+       }},
+      {"pwd",
+       [](auto tokens) {
+         // .string() returns type path as a native string
+         cout << fs::current_path().string() << endl;
        }},
   };
 
