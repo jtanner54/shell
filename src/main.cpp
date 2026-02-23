@@ -126,7 +126,8 @@ int main() {
 
              return;
            } else {
-             cerr << "cd: " << path << ": No such file or directory" << endl;
+             cerr << "cd: " << path.string() << ": No such file or directory"
+                  << endl;
              return;
            }
          }
