@@ -126,13 +126,12 @@ int main() {
 
              return;
            } else {
-             cout << "cd: \"" << path << "\": No such file or directory"
-                  << endl;
+             cerr << "cd: \"" << path << ": No such file or directory" << endl;
              return;
            }
          }
 
-         cout << "cd: too many arguments" << endl;
+         cerr << "cd: too many arguments" << endl;
        }},
   };
 
