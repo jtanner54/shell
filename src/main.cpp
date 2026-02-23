@@ -125,6 +125,9 @@ int main() {
              }
 
              return;
+           } else {
+             cout << "cd: " << path << ": No such file or directory" << endl;
+             return;
            }
          }
 
