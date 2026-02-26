@@ -76,6 +76,7 @@ vector<string> tokenize(const string& input) {
   vector<string> tokens;
   string current;
   bool in_single_quote = false;
+  bool in_double_quote = false;
 
   for (int i = 0; i < input.size(); i++) {
     char c = input[i];
@@ -86,9 +87,17 @@ vector<string> tokenize(const string& input) {
       } else {
         current += c;
       }
+    } else if (in_double_quote) {
+      if (c == '"') {
+        in_double_quote = false;
+      } else {
+        current += c;
+      }
     } else {
       if (c == '\'') {
         in_single_quote = true;
+      } else if (c == '"') {
+        in_double_quote = true;
       } else if (c == ' ') {
         if (!current.empty()) {
           tokens.push_back(current);
