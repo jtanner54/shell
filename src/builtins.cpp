@@ -59,6 +59,10 @@ int builtin_pwd(const std::vector<std::string>& /*args*/) {
 
 int builtin_cd(const std::vector<std::string>& args) {
   // only two args
+  if (args.size() > 2) {
+    std::cerr << "cd: too many arguments" << std::endl;
+    return 1;
+  }
   if (args.size() == 2) {
     fs::path path = args[1];
 
@@ -85,8 +89,7 @@ int builtin_cd(const std::vector<std::string>& args) {
     return 0;
   }
 
-  std::cerr << "cd: too many arguments" << std::endl;
-  return 1;
+  return 0;
 }
 
 // function type that returns nothing and takes in paramteer of

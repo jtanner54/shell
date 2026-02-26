@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
 project(shell-starter-cpp VERSION 1.0 LANGUAGES CXX)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Strictly enforce C++23 and disable non-standard compiler extensions
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -32,3 +34,4 @@ target_compile_options(shell PRIVATE
     -Wconversion
     -Wshadow
 )
+
