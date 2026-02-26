@@ -19,7 +19,7 @@ ParseResult tokenize(const std::string& input) {
       continue;
     }
 
-    if (c == '\\') {
+    if (c == '\\' && (!in_single_quote || !in_double_quote)) {
       escape_next = true;
       continue;
     }
