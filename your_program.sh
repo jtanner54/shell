@@ -1,25 +1,19 @@
 #!/bin/sh
-#
-# Use this script to run your program LOCALLY.
-#
-# Note: Changing this script WILL NOT affect how CodeCrafters runs your program.
-#
-# Learn more: https://codecrafters.io/program-interface
 
-set -e # Exit early if any commands fail
+set -e
 
-# Copied from .codecrafters/compile.sh
-#
-# - Edit this to change how your program compiles locally
-# - Edit .codecrafters/compile.sh to change how your program compiles remotely
+# 1. Resolve the script directory once
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
 (
-  cd "$(dirname "$0")" # Ensure compile steps are run within the repository directory
-  cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake
+  cd "$SCRIPT_DIR"
+  
+  # 2. Enforce VCPKG_ROOT existence. Fail loudly if missing.
+  TOOLCHAIN="${VCPKG_ROOT:?VCPKG_ROOT environment variable is not set}/scripts/buildsystems/vcpkg.cmake"
+  
+  cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE="$TOOLCHAIN"
   cmake --build ./build
 )
 
-# Copied from .codecrafters/run.sh
-#
-# - Edit this to change how your program runs locally
-# - Edit .codecrafters/run.sh to change how your program runs remotely
-exec $(dirname "$0")/build/shell "$@"
+# 3. Safely quote the execution path
+exec "$SCRIPT_DIR/build/shell" "$@"
