@@ -72,6 +72,46 @@ void execFile(string name, vector<string> args) {
   }
 }
 
+vector<string> tokenize(const string& input) {
+  vector<string> tokens;
+  string current;
+  bool in_single_quote = false;
+
+  for (int i = 0; i < input.size(); i++) {
+    char c = input[i];
+
+    if (in_single_quote) {
+      if (c == '\'') {
+        in_single_quote = false;
+      } else {
+        current += c;
+      }
+    } else {
+      if (c == '\'') {
+        in_single_quote = true;
+      } else if (c == ' ') {
+        if (!current.empty()) {
+          tokens.push_back(current);
+          current.clear();
+        }
+      } else {
+        current += c;
+      }
+    }
+  }
+
+  if (in_single_quote) {
+    cerr << "Error: unmatched single quote" << endl;
+    return {};
+  }
+
+  if (!current.empty()) {
+    tokens.push_back(current);
+  }
+
+  return tokens;
+}
+
 int main() {
   // Flush after every cout / cerr
   cout << unitbuf;
@@ -84,7 +124,8 @@ int main() {
       {"echo",
        [](auto tokens) {
          for (int i = 1; i < tokens.size(); i++) {
-           cout << tokens[i] << " ";
+           cout << tokens[i];
+           if (i >= 1) cout << " ";
          }
          cout << endl;
        }},
@@ -149,8 +190,9 @@ int main() {
 
     string input;
     getline(cin, input);
-    vector<string> tokens = split(input, ' ');
+    vector<string> tokens = tokenize(input);
 
+    if (tokens.empty()) continue;
     if (builtins.count(tokens[0])) {
       builtins[tokens[0]](tokens);
     } else {
