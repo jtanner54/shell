@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "builtins.h"
+#include "executor.h"
 #include "lexer.h"
 
 int main() {
@@ -28,7 +29,7 @@ int main() {
     if (is_builtin(result.tokens[0])) {
       execute_builtin(result.tokens);
     } else {
-      std::cerr << result.tokens[0] << " command not found: " << std::endl;
+      executeFile(result.tokens[0], result.tokens);
     }
   }
 
