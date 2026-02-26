@@ -19,8 +19,37 @@ ParseResult tokenize(const std::string& input) {
       continue;
     }
 
-    if (c == '\\' && !in_single_quote && !in_double_quote) {
-      escape_next = true;
+    // backslash in '' don't matter
+    if (in_single_quote) {
+      if (c == '\'')
+        in_single_quote = false;
+      else
+        current_token += c;
+      continue;
+    }
+
+    if (c == '\\') {
+      if (!in_double_quote) {
+        escape_next = true;
+        continue;
+      } else {
+        //  posix double quote logic
+        if (i + 1 < input.size()) {
+          char next_char = input[i + 1];
+          if (next_char == '"' || next_char == '\\' || next_char == '$' ||
+              next_char == '`' || next_char == '\n') {
+            escape_next = true;
+            continue;
+          }
+        }
+
+        current_token += c;
+        continue;
+      }
+    }
+
+    if (c == '"') {
+      in_double_quote = !in_double_quote;
       continue;
     }
 
@@ -29,12 +58,7 @@ ParseResult tokenize(const std::string& input) {
       continue;
     }
 
-    if (c == '"' && !in_single_quote) {
-      in_double_quote = !in_double_quote;
-      continue;
-    }
-
-    if (c == ' ' && !in_single_quote && !in_double_quote) {
+    if (std::isspace(static_cast<unsigned char>(c)) && !in_double_quote) {
       if (!current_token.empty()) {
         result.tokens.push_back(current_token);
         current_token.clear();
@@ -42,10 +66,6 @@ ParseResult tokenize(const std::string& input) {
     } else {
       current_token += c;
     }
-  }
-
-  if (!current_token.empty()) {
-    result.tokens.push_back(current_token);
   }
 
   if (in_single_quote) {
@@ -56,6 +76,10 @@ ParseResult tokenize(const std::string& input) {
     result.state = ParseState::NEED_ESCAPE;
   } else {
     result.state = ParseState::COMPLETE;
+  }
+
+  if (!current_token.empty()) {
+    result.tokens.push_back(current_token);
   }
 
   return result;
