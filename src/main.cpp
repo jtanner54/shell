@@ -19,7 +19,7 @@ int main() {
       std::cout << "> ";
       std::string more;
       std::getline(std::cin, more);
-      input += more;
+      input += "\n" + more;
       result = tokenize(input);
     }
 
