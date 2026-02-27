@@ -53,6 +53,19 @@ ParseResult tokenize(const std::string& input) {
       in_single_quote = true;
     } else if (c == '"') {
       in_double_quote = true;
+    } else if (c == '>' || c == '<') {
+      // operator terminates current token
+      if (!current_token.empty()) {
+        result.tokens.push_back(current_token);
+        current_token.clear();
+      }
+
+      // if multi character operator, consume next char
+      // TODO
+
+      // add operator as its own token
+      result.tokens.push_back(std::string(1, c));
+
     } else if (std::isspace(static_cast<unsigned char>(c))) {
       if (!current_token.empty()) {
         result.tokens.push_back(current_token);

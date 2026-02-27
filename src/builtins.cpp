@@ -1,5 +1,8 @@
 #include "builtins.h"
 
+#include <fcntl.h>
+#include <unistd.h>
+
 #include <cstdlib>
 #include <filesystem>
 #include <iostream>
@@ -111,14 +114,61 @@ const std::unordered_map<std::string, BuiltinFunc> registry = {
 
 bool is_builtin(const std::string& name) { return registry.count(name); }
 
-int execute_builtin(const std::vector<std::string>& args) {
-  if (args.empty()) return 0;
+int execute_builtin(const Command& cmd) {
+  if (cmd.args.empty()) return 0;
 
-  auto it = registry.find(args[0]);
+  auto it = registry.find(cmd.args[0]);
 
-  if (it != registry.end()) {
-    return it->second(args);
+  if (it == registry.end()) {
+    return 127;
   }
 
-  return 127;
+  int saved_stdout = -1;
+
+  // setup redirection
+  if (!cmd.redirect_out.empty()) {
+    // backup stdout / duplicate it
+    saved_stdout = dup(STDOUT_FILENO);
+    if (saved_stdout == -1) {
+      perror("Failed to backup stdout");
+      return 1;
+    }
+
+    int flags = O_WRONLY | O_CREAT;
+    mode_t mode = 0644;  // rw-r--r--
+
+    int fd = open(cmd.redirect_out.c_str(), flags, mode);
+    if (fd == -1) {
+      perror("Failed to open file for redirection");
+      close(saved_stdout);
+      return 1;
+    }
+
+    // replace stdout with the file descriptor
+    if (dup2(fd, STDOUT_FILENO) == -1) {
+      perror("Failed to redirect output");
+      close(fd);
+      close(saved_stdout);
+      return 1;
+    }
+
+    close(fd);  // fd is now duplicated to stdout, decrease ref count
+  }
+
+  int status = it->second(cmd.args);
+
+  if (saved_stdout != -1) {
+    // flush stdout before restoring
+    std::cout << std::flush;
+    fflush(stdout);
+
+    // restore original stdout
+    if (dup2(saved_stdout, STDOUT_FILENO) == -1) {
+      perror("Failed to restore stdout");
+    }
+
+    close(saved_stdout);
+  }
+
+  return status;
 }

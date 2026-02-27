@@ -1,4 +1,5 @@
-#pragma once
+#ifndef LEXER_H
+#define LEXER_H
 
 #include <string>
 #include <vector>
@@ -16,3 +17,5 @@ struct ParseResult {
 };
 
 ParseResult tokenize(const std::string& input);
+
+#endif  // LEXER_H
