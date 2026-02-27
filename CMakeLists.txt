@@ -27,7 +27,7 @@ target_include_directories(shell PRIVATE include)
 target_link_libraries(shell PRIVATE readline)
 
 # Disable debug statements
-#target_compile_definitions(shell PRIVATE NDEBUG)
+target_compile_definitions(shell PRIVATE NDEBUG)
 
 # Mandatory strict compiler warnings
 target_compile_options(shell PRIVATE 
