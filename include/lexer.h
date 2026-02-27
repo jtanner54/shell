@@ -11,7 +11,7 @@ enum class ParseState {
 };
 
 struct ParseResult {
-  ParseState state;
+  ParseState state = ParseState::COMPLETE;
   std::vector<std::string> tokens;
 };
 

@@ -15,7 +15,7 @@ std::string searchExecutable(const std::string& name) {
   if (path != nullptr) {
     std::vector<std::string> paths = split(path, ':');
 
-    for (std::string p : paths) {
+    for (const auto& p : paths) {
       std::string executable = p + "/" + name;
 
       if (fs::exists(executable) && access(executable.c_str(), X_OK) == 0) {
@@ -61,6 +61,6 @@ void executeFile(const std::string& name,
       waitpid(pid, &status, 0);
     }
   } else {
-    std::cout << name << ": command not found" << std::endl;
+    std::cerr << name << ": command not found" << std::endl;
   }
 }

@@ -1,7 +1,5 @@
 #include "lexer.h"
 
-#include <iostream>
-
 ParseResult tokenize(const std::string& input) {
   ParseResult result;
   std::string current_token;
@@ -39,15 +37,23 @@ ParseResult tokenize(const std::string& input) {
             continue;
           }
         }
+        current_token += c;
       } else if (c == '"') {
         in_double_quote = false;
+      } else {
+        current_token += c;
       }
-
-      current_token += c;
       continue;
     }
 
-        if (std::isspace(static_cast<unsigned char>(c)) && !in_double_quote) {
+    // outside any quotes
+    if (c == '\\') {
+      escape_next = true;
+    } else if (c == '\'') {
+      in_single_quote = true;
+    } else if (c == '"') {
+      in_double_quote = true;
+    } else if (std::isspace(static_cast<unsigned char>(c))) {
       if (!current_token.empty()) {
         result.tokens.push_back(current_token);
         current_token.clear();
