@@ -1,5 +1,8 @@
 #include <iostream>
 
+#include <readline/readline.h>
+
+#include "completion.h"
 #include "debug.h"
 #include "lexer.h"
 #include "parser.h"
@@ -9,10 +12,16 @@ int main() {
   std::cout << std::unitbuf;
   std::cerr << std::unitbuf;
 
+  init_completion();
+
   while (true) {
-    std::cout << "$ ";
-    std::string input;
-    std::getline(std::cin, input);
+    char* line = readline("$ ");
+    if (!line) break;  // EOF (Ctrl+D)
+    std::string input(line); // direct initialization
+    if (input.empty()) {
+      free(line);
+      continue;
+    }
 
     ParseResult result = tokenize(input);
 

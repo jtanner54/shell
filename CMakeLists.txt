@@ -17,6 +17,7 @@ set(SOURCE_FILES
     src/utils.cpp
     src/parser.cpp
     src/ast.cpp
+    src/completion.cpp
 )
 
 add_executable(shell ${SOURCE_FILES})

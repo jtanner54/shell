@@ -114,6 +114,16 @@ const std::unordered_map<std::string, BuiltinFunc> registry = {
 
 bool is_builtin(const std::string& name) { return registry.count(name); }
 
+const std::vector<std::string>& get_builtin_names() {
+  static std::vector<std::string> names;
+  if (names.empty()) {
+    for (const auto& [name, _] : registry) {
+      names.push_back(name);
+    }
+  }
+  return names;
+}
+
 int execute_builtin(const std::vector<std::string>& args) {
   if (args.empty()) return 0;
 
