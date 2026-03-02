@@ -17,9 +17,9 @@ struct ASTNode {
 struct SimpleCommandNode : public ASTNode {
   std::vector<std::string> args;
   std::string redirect_out;
-  //bool append_out = false;
-  int redirect_out_fd = 1;
   //std::string redirect_in;
+  bool append_out = false; // >> vs >
+  int redirect_out_fd = 1;
 
   int execute() override;
 };

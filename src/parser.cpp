@@ -52,6 +52,18 @@ std::unique_ptr<ASTNode> Parser::parse_command() {
       }
 
       node->redirect_out = advance();  // consume filename
+    } else if (peek() == ">>" || peek() == "1>>" || peek() == "2>>") {
+      if (peek() == "2>>") node->redirect_out_fd = 2;
+
+      advance();  // consume redirect
+
+      if (is_at_end()) {
+        std::cerr << "Syntax error: expected filename after '>>'\n";
+        return nullptr;
+      }
+
+      node->redirect_out = advance();  // consume filename
+      node->append_out = true;
     } else {
       node->args.push_back(advance());
     }

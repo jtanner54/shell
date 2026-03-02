@@ -59,15 +59,17 @@ ParseResult tokenize(const std::string& input) {
         result.tokens.push_back(current_token);
         current_token.clear();
       }
+      
+      std::string op(1, c);
+      if (i + 1 < input.size() && input[i + 1] == '>') {
+        op += '>';
+        i++;  // consume next char
+      }
 
-      // if multi character operator, consume next char
-      // TODO
-
-      // add operator as its own token
-      if (result.tokens.back() == "1" || result.tokens.back() == "2") {
-        result.tokens.back() += c;  // combine with previous token
+      if (!result.tokens.empty() && (result.tokens.back() == "1" || result.tokens.back() == "2")) {
+        result.tokens.back() += op;  // combine with previous token
       } else {
-        result.tokens.push_back(std::string(1, c));
+        result.tokens.push_back(op);
       }
     } else if (std::isspace(static_cast<unsigned char>(c))) {
       if (!current_token.empty()) {

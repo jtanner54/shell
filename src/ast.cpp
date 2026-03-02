@@ -25,7 +25,7 @@ int SimpleCommandNode::execute() {
         return 1;
       }
 
-      int flags = O_WRONLY | O_CREAT;
+      int flags = O_WRONLY | O_CREAT | (append_out ? O_APPEND : O_TRUNC);
       mode_t mode = 0644;  // rw-r--r--
 
       int fd = open(redirect_out.c_str(), flags, mode);
@@ -109,7 +109,7 @@ int SimpleCommandNode::execute() {
 
     // output redirection
     if (!redirect_out.empty()) {
-      int flags = O_WRONLY | O_CREAT;
+      int flags = O_WRONLY | O_CREAT | (append_out ? O_APPEND : O_TRUNC);
       mode_t mode = 0644;  // rw-r--r--
 
       int fd = open(redirect_out.c_str(), flags, mode);
